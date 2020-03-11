@@ -62,4 +62,22 @@ RSpec.describe Game, type: :model do
     end
   end
 
+  context "with all frames" do
+    before :each do
+      9.times do
+        game.throw! 3
+        game.throw! 6
+      end
+    end
+
+    it "should not allow more throws after 10 frames" do
+      game.throw! 3
+      game.throw! 6
+      expect(game.score).to eq 90
+      expect(game.frames).to eq [[3,6]]*10
+      expect(game.game_finished?).to eq true
+      expect { game.throw! 3 }.to raise_error("Game is finished! You can't throw anymore")
+    end
+  end
+
 end
