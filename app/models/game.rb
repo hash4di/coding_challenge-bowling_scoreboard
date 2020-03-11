@@ -1,17 +1,22 @@
 class Game < ApplicationRecord
+  include Exceptions
   serialize :frames, Array
 
   before_save do
     self.score = frames.flatten.sum
+    self.frames = [[]] if frames.empty?
   end
 
   def throw! knocked_pins
-    raise("Game is finished! You can't throw anymore.") if game_finished?
-    frames << [] if frame_completed?(frames.last)
-    raise("Cheater! You can't hit more pins than remaining.") unless knocked_pins.between?(0, available_pins)
-    frames.last << knocked_pins
-    complete_previous_open_frame_with knocked_pins
-    save!
+    self.transaction do
+      self.lock!
+      raise(GameFinishedError, "Game is finished! You can't throw anymore.") if game_finished?
+      raise(InvalidAvailablePinsError, "Cheater! You can't hit more pins than remaining.") unless knocked_pins.between?(0, available_pins)
+      frames.last << knocked_pins
+      complete_previous_open_frame_with knocked_pins
+      frames << [] if frame_completed?(frames.last) && game_finished?.!
+      save!
+    end
   end
 
   def game_finished?
@@ -22,7 +27,7 @@ class Game < ApplicationRecord
 
   def complete_previous_open_frame_with value
     frames.map do |frame|
-      next if frame == frames.last
+      next if frame.equal?(frames.last)
       #strike = knocked 10 pins with 1st throw
       frame << value if strike?(frame) && frame.size <= 2
       #spare = knocked 10 pins in two throws

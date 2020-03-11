@@ -1,38 +1,37 @@
 require 'rails_helper'
-GAME_ERROR = "Game is finished! You can't throw anymore."
-CHEATING_ERROR = "Cheater! You can't hit more pins than remaining."
+include Exceptions
 
 RSpec.describe Game, type: :model do
-  let(:game) { Game.new }
+  let(:game) { Game.create }
 
   it "should have score and frames" do
     expect(game.score).to eq 0
-    expect(game.frames).to eq []
+    expect(game.frames).to eq [[]]
   end
 
 
   context "knocking only available pins" do
     context "on a normal frame" do
       it "should knock only available number of pins" do
-        expect { game.throw! 11 }.to raise_error CHEATING_ERROR
-        expect { game.throw! -1 }.to raise_error CHEATING_ERROR
+        expect { game.throw! 11 }.to raise_error InvalidAvailablePinsError
+        expect { game.throw! -1 }.to raise_error InvalidAvailablePinsError
       end
 
       it "should knock only available number of pins after a throw" do
         game.throw! 7
-        expect { game.throw! 4 }.to raise_error CHEATING_ERROR
+        expect { game.throw! 4 }.to raise_error InvalidAvailablePinsError
       end
     end
   end
 
   context "with one frame" do
     it "should show correct summed score from two throws" do
-      game.throw!(4)
+      game.throw! 4
       expect(game.score).to eq 4
-      game.throw!(3)
+      game.throw! 3
       expect(game.score).to eq 7
 
-      expect(game.frames).to eq [[4,3]]
+      expect(game.frames).to eq [[4,3], []]
     end
   end
 
@@ -43,14 +42,14 @@ RSpec.describe Game, type: :model do
       game.throw! 3
 
       expect(game.score).to eq 7
-      expect(game.frames).to eq [[4,3]]
+      expect(game.frames).to eq [[4,3], []]
 
       game.throw! 6
       expect(game.score).to eq 13
       game.throw! 3
         
       expect(game.score).to eq 16
-      expect(game.frames).to eq [[4,3], [6,3]]
+      expect(game.frames).to eq [[4,3], [6,3], []]
     end
 
     context "with a strike" do
@@ -61,7 +60,7 @@ RSpec.describe Game, type: :model do
         game.throw! 4
         game.throw! 4
         expect(game.score).to eq 26
-        expect(game.frames).to eq [[10, 4, 4], [4,4]]
+        expect(game.frames).to eq [[10, 4, 4], [4,4], []]
       end
     end
 
@@ -74,7 +73,7 @@ RSpec.describe Game, type: :model do
         game.throw! 4
         game.throw! 4
         expect(game.score).to eq 22
-        expect(game.frames).to eq [[3, 7, 4], [4,4]]
+        expect(game.frames).to eq [[3, 7, 4], [4,4], []]
       end
     end
   end
@@ -93,7 +92,7 @@ RSpec.describe Game, type: :model do
       expect(game.score).to eq 90
       expect(game.frames).to eq [[3,6]]*10
       expect(game.game_finished?).to eq true
-      expect { game.throw! 3 }.to raise_error(GAME_ERROR)
+      expect { game.throw! 3 }.to raise_error(GameFinishedError)
     end
 
     it "should handle strike in last frame" do
@@ -108,7 +107,7 @@ RSpec.describe Game, type: :model do
       expect { game.throw! 5 }.not_to raise_error
       expect(game.score).to eq 98
       expect(game.game_finished?).to eq true
-      expect { game.throw! 4 }.to raise_error(GAME_ERROR)
+      expect { game.throw! 4 }.to raise_error(GameFinishedError)
     end
 
     it "should handle spare in last frame" do
@@ -120,7 +119,7 @@ RSpec.describe Game, type: :model do
       expect { game.throw! 7 }.not_to raise_error
       expect(game.score).to eq 98
       expect(game.game_finished?).to eq true
-      expect { game.throw! 1 }.to raise_error(GAME_ERROR)
+      expect { game.throw! 1 }.to raise_error(GameFinishedError)
     end
   end
 
