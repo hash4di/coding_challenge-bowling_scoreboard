@@ -12,6 +12,7 @@ class GamesController < ApplicationController
   def show
     game_hash = {
       score: game.score,
+      score_by_frame: game.frames,
       frame_number: game.frames.count,
       game_finished: game.game_finished?,
     }
@@ -29,6 +30,7 @@ class GamesController < ApplicationController
     else
       render json: {message: "Game not found."}, status: 404
     end
+
   rescue GameFinishedError, InvalidAvailablePinsError => e
     render json: {message: e.message}, status: 422
   end
