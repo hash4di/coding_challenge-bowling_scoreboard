@@ -5,11 +5,16 @@ class Game < ApplicationRecord
     self.score = frames.flatten.sum
   end
 
-  def throw! knocked_pins 
+  def throw! knocked_pins
+    raise("Game is finished! You can't throw anymore") if game_finished?
     frames << [] if frame_completed?(frames.last)
     frames.last << knocked_pins
     complete_previous_open_frame_with knocked_pins
     save!
+  end
+
+  def game_finished?
+    frames.size==10 && frame_completed?(frames.last)
   end
 
   private
