@@ -242,16 +242,16 @@ PLATFORMS
   x86-mswin32
 
 DEPENDENCIES
-  awesome_print
+  awesome_print (= 1.8.0)
   bootsnap (>= 1.4.2)
   jbuilder (~> 2.7)
   listen (>= 3.0.5, < 3.2)
   pg (>= 0.18, < 2.0)
-  pry-byebug
-  pry-rails
+  pry-byebug (= 3.8.0)
+  pry-rails (= 0.3.9)
   puma (~> 4.1)
   rails (~> 6.0.2, >= 6.0.2.1)
-  rspec-rails
+  rspec-rails (= 3.9.1)
   sass-rails (>= 6)
   spring
   spring-watcher-listen (~> 2.0.0)
