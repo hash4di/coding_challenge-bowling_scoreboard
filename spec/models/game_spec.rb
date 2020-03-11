@@ -1,4 +1,6 @@
 require 'rails_helper'
+GAME_ERROR = "Game is finished! You can't throw anymore."
+CHEATING_ERROR = "Cheater! You can't hit more pins than remaining."
 
 RSpec.describe Game, type: :model do
   let(:game) { Game.new }
@@ -6,6 +8,21 @@ RSpec.describe Game, type: :model do
   it "should have score and frames" do
     expect(game.score).to eq 0
     expect(game.frames).to eq []
+  end
+
+
+  context "knocking only available pins" do
+    context "on a normal frame" do
+      it "should knock only available number of pins" do
+        expect { game.throw! 11 }.to raise_error CHEATING_ERROR
+        expect { game.throw! -1 }.to raise_error CHEATING_ERROR
+      end
+
+      it "should knock only available number of pins after a throw" do
+        game.throw! 7
+        expect { game.throw! 4 }.to raise_error CHEATING_ERROR
+      end
+    end
   end
 
   context "with one frame" do
@@ -76,7 +93,34 @@ RSpec.describe Game, type: :model do
       expect(game.score).to eq 90
       expect(game.frames).to eq [[3,6]]*10
       expect(game.game_finished?).to eq true
-      expect { game.throw! 3 }.to raise_error("Game is finished! You can't throw anymore")
+      expect { game.throw! 3 }.to raise_error(GAME_ERROR)
+    end
+
+    it "should handle strike in last frame" do
+      game.throw! 10
+      expect(game.score).to eq 91
+      expect(game.game_finished?).to eq false
+
+      expect { game.throw! 2 }.not_to raise_error
+      expect(game.score).to eq 93
+      expect(game.game_finished?).to eq false
+
+      expect { game.throw! 5 }.not_to raise_error
+      expect(game.score).to eq 98
+      expect(game.game_finished?).to eq true
+      expect { game.throw! 4 }.to raise_error(GAME_ERROR)
+    end
+
+    it "should handle spare in last frame" do
+      game.throw! 4
+      game.throw! 6
+      expect(game.score).to eq 91
+      expect(game.game_finished?).to eq false
+
+      expect { game.throw! 7 }.not_to raise_error
+      expect(game.score).to eq 98
+      expect(game.game_finished?).to eq true
+      expect { game.throw! 1 }.to raise_error(GAME_ERROR)
     end
   end
 
