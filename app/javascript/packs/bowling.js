@@ -1,16 +1,17 @@
 $(function(){
+  api_url_path = "/api/v1/games/"
   current_game_id = null;
 
   $("#new-game-but").on('click', function(){
-    $.post("/games", {})
+    $.post(api_url_path, {})
       .done(function(data){
         update_current_game_id(data.id);
         update_score();
         clear_error_message();
-        console.log("Success on requesting POST '/games'. Created game with id: " + data.id);
+        console.log("Success on requesting POST '"+ api_url_path + "'. Created game with id: " + data.id);
       })
       .fail(function(data){
-        console.error("Error on requesting POST '/games'.");
+        console.error("Error on requesting POST '"+ api_url_path + "'.");
         console.error(data);
       })
   })
@@ -32,31 +33,32 @@ $(function(){
   }
 
   function update_score(){
-    $.get("/games/" + current_game_id)
+    $.get(api_url_path + current_game_id)
       .done(function(data){
-        console.log("Success on requesting GET '/games/" + current_game_id);
+        console.log("Success on requesting GET '"+ api_url_path + current_game_id + "'");
         $("#game-score").text(data.score);
-        $("#game-frames").text(data.frame_number);
-        $("#game-over").text(data.game_finished);
+        $("#game-score-by-frame").text(JSON.stringify(data.score_by_frame)); //@WIP: implement working solution for frames with score.
+        $("#game-frames").text(data.score_by_frame.length); //@WIP: find solution for not passing unidentify.
+        $("#game-finished").text(data.game_finished.toString()); //@WIP: implement working solution with game status.
       })
       .fail(function(data){
-        console.error("Error on requesting GET '/games/" + current_game_id);
+        console.error("Error on requesting GET '"+ api_url_path + current_game_id);
         console.error(data);
       })
   }
 
   function send_knocked_pins(knocked_pins){
     $.ajax({
-        "url": "/games/"+current_game_id,
+        "url": api_url_path + current_game_id,
         "type": "PUT",
         "data": {"knocked_pins": knocked_pins},
         done: function (data, text) {
           update_score();
           clear_error_message();
-          console.log("Success on requesting PUT '/games/" + current_game_id + " with body: {knocked_pins: " + knocked_pins + "}");
+          console.log("Success on requesting PUT '"+ api_url_path + current_game_id + "' with body: {knocked_pins: " + knocked_pins + "}");
           $("#knocked-pins").val("");
         },
-        fail: function (request, status, error) {
+        error: function (request, status, error) {
           try {
             error_message = request.responseJSON.message;
           }
@@ -65,7 +67,7 @@ $(function(){
           }
           finally {
             update_error_message(error_message);
-            console.error("Error on requesting PUT '/games/" + current_game_id + " with body: {knocked_pins: " + knocked_pins + "}");
+            console.error("Error on requesting PUT '"+ api_url_path + current_game_id + "' with body: {knocked_pins: " + knocked_pins + "}");
             console.error(request);
           }
         }
@@ -73,7 +75,7 @@ $(function(){
   }
 
   function update_error_message(message){
-    if (!message) { message = "Server error." }
+    if (!message) { message = "Wrong Pins format. Please use only numbers in the range 1 - 10." }
     $("#error-message").text(message);
   }
 

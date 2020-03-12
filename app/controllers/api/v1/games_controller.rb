@@ -1,4 +1,4 @@
-class Api::V1::GamesController < ApplicationController
+class GamesController < ApplicationController
   include Exceptions
   skip_before_action :verify_authenticity_token #easier API preview
 
@@ -18,10 +18,14 @@ class Api::V1::GamesController < ApplicationController
     render json: game_hash, status: 200
   end
 
+  def show
+    render json: {score: game.score}, status: 200
+  end
+
   def update
     if game
       game.throw! update_params[:knocked_pins].to_i
-      render json: {}, status: 204
+      render json: {}, status: 200
     else
       render json: {message: "Game not found."}, status: 404
     end
@@ -30,7 +34,7 @@ class Api::V1::GamesController < ApplicationController
     render json: {message: e.message}, status: 422
   end
 
-  private
+private
 
   def new_game
     @new_game ||= Game.create

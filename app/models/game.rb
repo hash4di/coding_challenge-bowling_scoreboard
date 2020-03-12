@@ -11,7 +11,7 @@ class Game < ApplicationRecord
     self.transaction do
       self.lock!
       raise(GameFinishedError, "Game is finished! You can't throw anymore.") if game_finished?
-      raise(InvalidAvailablePinsError, "Cheater! You can't hit more pins than remaining.") unless knocked_pins.between?(0, available_pins)
+      raise(InvalidAvailablePinsError, "Cheater! You can't hit more pins than available.") unless knocked_pins.between?(0, available_pins)
       frames.last << knocked_pins
       complete_previous_open_frame_with knocked_pins
       frames << [] if frame_completed?(frames.last) && game_finished?.!
