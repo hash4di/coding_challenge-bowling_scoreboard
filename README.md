@@ -1,4 +1,4 @@
-# Coding Challenge: Bowling Scoreboard
+# Coding Challenge: Bowling Scoreboard with API
 
 ## Tech stack:
   - `Ruby: 2.7.0`
@@ -22,6 +22,15 @@
   <pre>
     $ bunde exec rspec
   </pre>
+
+***
+
+### TODO
+
+  - [ ] Add views testing.
+  - [ ] Add double strike logic coverage.
+  - [ ] Update layout to be more user friendly.
+  - [ ] Add tests to coverage more game throw scenarios.
   
 ## Rules:
   https://en.wikipedia.org/wiki/Ten-pin_bowling
