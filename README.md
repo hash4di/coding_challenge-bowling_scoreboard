@@ -1,24 +1,31 @@
-# README
+# Coding Challenge: Bowling Scoreboard
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+## Tech stack:
+  - `Ruby: 2.7.0`
+  - `Rails: 6.0.2.1`
+  - `Bundler: 2.1.4`
+  - `Rspec: 4-0-dev [issues with new Rails 6 build, stil WIP]`
 
-Things you may want to cover:
+## Installation:
+  <pre>
+    $ gem install bundler
+    $ bundle install
+  </pre>
+  
+## Runing:
+  <pre>
+    1. $ bunde exec bin/rails s
+    2. open browser on http://localhost:3000
+  </pre>
+  
+## Testing:
+  <pre>
+    $ bunde exec rspec
+  </pre>
+  
+## Rules:
+  https://en.wikipedia.org/wiki/Ten-pin_bowling
+  
+***
 
-* Ruby version
-
-* System dependencies
-
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+### LICENSE: MIT©️
